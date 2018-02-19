@@ -158,11 +158,14 @@ define(function(require, exports, module) {
                         
                         return pane;
                     }
-                    
+
                     if (args.server) {
                         var openInNewTab = args.newTab;
                         path = args.url;
                         
+                        if (!path)
+                            path = settings.get("project/preview/@url");
+
                         if (!path)
                             path = "https://$C9_HOSTNAME";
                         
