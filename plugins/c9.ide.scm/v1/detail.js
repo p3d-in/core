@@ -274,7 +274,7 @@ define(function(require, exports, module) {
             label: "untracked files",
             className: "heading",
             items: [],
-            isOpen: false,
+            isOpen: true,
             isFolder: true,
             map: {},
             noSelect: true,
@@ -352,7 +352,7 @@ define(function(require, exports, module) {
                                 isFolder: name.slice(-1) == "/"
                             });
                         }
-                        if (x[1] == "!") {
+                        else if (x[1] == "!") {
                             ignored.items.push({
                                 label: name,
                                 path: name,

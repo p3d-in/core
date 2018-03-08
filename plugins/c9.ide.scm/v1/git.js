@@ -35,7 +35,7 @@ define(function(require, exports, module) {
         }
         
         function addAll(callback) {
-            git("add -u", callback);
+            git("add .", callback);
         }
         
         function addFileToStaging(paths, callback) {
@@ -72,6 +72,7 @@ define(function(require, exports, module) {
         }
         
         function git(args, cb) {
+            // console.log('git cwd:', workspaceDir, 'args:', args)
             if (typeof args == "string")
                 args = args.split(/\s+/);
                 
@@ -82,8 +83,7 @@ define(function(require, exports, module) {
                 // if (e) console.error(e);
                 
                 buffer(p, function(stdout, stderr) {
-                    // console.log(e, stdout);
-                    
+                    // console.log(e, stdout, stderr);
                     cb && cb(e, stdout, stderr);
                 });
             });
@@ -125,6 +125,7 @@ define(function(require, exports, module) {
                 options.twoWay = true;
                 args.push("status", "--porcelain", "-b", "-z");
                 // if (!ignored.isOpen)
+                if (options.untracked == "no")
                     args.push("--untracked-files=no");
                 if (options.untracked == "all")
                     args.push("--untracked-files=all");
