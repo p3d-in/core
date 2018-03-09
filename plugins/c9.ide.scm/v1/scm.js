@@ -2,7 +2,7 @@ define(function(require, exports, module) {
     main.consumes = [
         "Panel", "Menu", "MenuItem", "Divider", "settings", "ui", "c9", 
         "watcher", "panels", "util", "save", "preferences", "commands", "Tree",
-        "Datagrid", "tabManager", "layout", "preferences.experimental"
+        "Datagrid", "tabManager", "layout", "preferences.experimental", "dialog.alert"
     ];
     main.provides = ["scm"];
     return main;
@@ -103,6 +103,7 @@ define(function(require, exports, module) {
         var prefs = imports.preferences;
         var commands = imports.commands;
         var experimental = imports["preferences.experimental"];
+        var alert = imports["dialog.alert"].show;
         
         // var Tooltip = require("ace_tree/tooltip");
         var DataProvider = require("ace_tree/data_provider");
@@ -267,7 +268,7 @@ define(function(require, exports, module) {
                         skinset: "default",
                         skin: "codebox",
                         class: "tb_textbox",
-                        value: "/",
+                        value: "/project",
                         onkeyup: function(event) {
                             if (event.keyCode === 13) {
                                 refreshWorkspace();
@@ -683,6 +684,8 @@ define(function(require, exports, module) {
             }
             
             emit.sticky("drawPanels", { html: container.$int, aml: container });
+
+            setTimeout(refreshWorkspace, 800);
         }
         
         /***** Methods *****/
@@ -737,11 +740,14 @@ define(function(require, exports, module) {
             scm.commit({ 
                 message: message,
                 amend: amend
-            }, function(err) {
+            }, function(err, stdout, stderr) {
                 if (err) return console.error(err);
-                
-                emit("reload");
-                getLog();
+                if (stderr) {
+                    alert("Error", "Git Error", stderr, null, {isHTML: false});
+                } else {
+                    emit("reload");
+                    getLog();
+                }
                 
                 callback && callback();
             });
@@ -776,9 +782,13 @@ define(function(require, exports, module) {
         }
         
         function addAll() {
-            scm.addAll(function(err) {
+            scm.addAll(function(err, stdout, stderr) {
                 if (err) return console.error(err);
-                emit("reload");
+                if (stderr) {
+                    alert("Error", "Git Error", stderr, null, {isHTML: false});
+                } else {
+                    emit("reload");
+                }
             });
         }
         function unstageAll() {
